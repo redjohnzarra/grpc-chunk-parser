@@ -1,6 +1,6 @@
 {
     "name": "gprc-chunk-parser",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Typescript package for parsing grpc chunk data",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -12,9 +12,12 @@
         "typescript",
         "github packages",
         "npm packages",
-        "boilerplate"
+        "grpc",
+        "chunk",
+        "grpc stream",
+        "chunk parse"
     ],
-    "author": "Dale Nguyen",
+    "author": "Reden John Zarra",
     "license": "ISC",
     "repository": {
         "type": "git",
