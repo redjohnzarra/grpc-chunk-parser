@@ -1,6 +1,6 @@
 {
-    "name": "@redjohnzarra/grpc-chunk-parser",
-    "version": "1.0.6",
+    "name": "grpc-chunk-parser",
+    "version": "1.0.7",
     "description": "Typescript package for parsing grpc chunk data",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -37,6 +37,6 @@
         "node": ">=8"
     },
     "publishConfig": {
-        "registry": "https://npm.pkg.github.com/@redjohnzarra"
+        "@redjohnzarra:registry": "https://npm.pkg.github.com"
     }
 }
