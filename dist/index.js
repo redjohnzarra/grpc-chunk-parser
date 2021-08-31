@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseGrpcData = void 0;
 var lodash_1 = require("lodash");
 exports.parseGrpcData = function (url, method, headers, body, onChunkReceive, limiter) { return __awaiter(void 0, void 0, void 0, function () {
     var lastCutData, allData, limiterData, hasLimiter, res, reader, decoder, _a, value, done, chunk, chunkData, lastData, includedParsedData, firstData;
