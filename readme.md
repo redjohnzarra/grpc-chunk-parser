@@ -31,9 +31,9 @@ import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
 
 parseGrpcData has 6 parameters
 
-1: `url` - required - the grpc http endpoint
-2: `method` - required - http method, currently 'POST' or 'GET'
-3: `headers` - required - object request headers
-4: `body` - required - object request body
-5: `onChunkReceive` - required - function that returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 6th param)
+1: `url` - required - the grpc http endpoint  
+2: `method` - required - http method, currently 'POST' or 'GET'  
+3: `headers` - required - object request headers  
+4: `body` - required - object request body  
+5: `onChunkReceive` - required - function that returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 6th param)  
 6: `limiter` - optional - number of items to be returned in each chunk (chunk pagesize)
