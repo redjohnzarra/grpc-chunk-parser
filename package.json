@@ -1,6 +1,6 @@
 {
     "name": "grpc-chunk-parser",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Typescript package for parsing grpc chunk data",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
     "license": "ISC",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/redjohnzarra/grpc-chunk-parser.git"
+        "url": "git://github.com/redjohnzarra/grpc-chunk-parser.git"
     },
     "devDependencies": {
         "@types/node": "^14.11.2",
