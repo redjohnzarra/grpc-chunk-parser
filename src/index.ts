@@ -72,5 +72,8 @@ export const parseGrpcData = async (
             onChunkReceive(returnedData);
         }
     }
-    if (hasLimiter && limiterData.length > 0) onChunkReceive(limiterData);
+    if (hasLimiter && limiterData.length > 0) {
+        const returnedData = concatData ? allData : limiterData;
+        onChunkReceive(returnedData);
+    }
 };
