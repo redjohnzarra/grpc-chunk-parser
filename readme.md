@@ -52,6 +52,6 @@ parseGrpcData(
     (data: any) => {
         console.log('returned data', data);
     },
-    6
+    6 // Every 6 items received, the function in param 5 `onChunkReceive` will be called.
 );
 ```
