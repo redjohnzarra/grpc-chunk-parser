@@ -10,7 +10,8 @@ export const parseGrpcData = async (
     headers: DynamicObject,
     body: DynamicObject,
     onChunkReceive: (data: any) => void,
-    limiter?: number
+    limiter?: number,
+    concatData?: boolean //returns all data from start until the limit
 ) => {
     let lastCutData = '';
     const allData: DynamicObject[] = [];
@@ -54,7 +55,10 @@ export const parseGrpcData = async (
                         if (limiterData.length === limiter) {
                             const newLimiterData = clone(limiterData);
                             limiterData.splice(0, limiter);
-                            onChunkReceive(newLimiterData);
+                            const returnedData = concatData
+                                ? allData
+                                : newLimiterData;
+                            onChunkReceive(returnedData);
                         }
                     }
                 } catch (_err) {
@@ -63,7 +67,10 @@ export const parseGrpcData = async (
             }
         });
 
-        if (!hasLimiter) onChunkReceive(chunk);
+        if (!hasLimiter) {
+            const returnedData = concatData ? allData : chunk;
+            onChunkReceive(returnedData);
+        }
     }
     if (hasLimiter && limiterData.length > 0) onChunkReceive(limiterData);
 };
