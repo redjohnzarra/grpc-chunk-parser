@@ -29,3 +29,29 @@ parseGrpcData has 6 parameters
 4. `body` - required - object request body
 5. `onChunkReceive` - required - function that returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 6th param)
 6. `limiter` - optional - number of items to be returned in each chunk (chunk pagesize)
+
+## Example
+
+```
+import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
+
+const headers = {
+    //Header object
+};
+const body = {
+    //Body object
+};
+
+const url = SAMPLE_URL_HERE;
+
+parseGrpcData(
+    url,
+    'POST',
+    headers,
+    body,
+    (data: any) => {
+        console.log('returned data', data);
+    },
+    6
+);
+```
