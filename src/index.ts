@@ -6,7 +6,7 @@ export interface DynamicObject {
 
 export const parseGrpcData = async (
     url: string,
-    method: 'POST' | 'GET',
+    method: 'POST' | 'GET' | 'post' | 'get',
     headers: DynamicObject,
     body: DynamicObject,
     onChunkReceive: (data: any) => void,
@@ -14,7 +14,7 @@ export const parseGrpcData = async (
 ) => {
     let lastCutData = '';
     const allData: DynamicObject[] = [];
-    let limiterData: DynamicObject[] = [];
+    const limiterData: DynamicObject[] = [];
     const hasLimiter = limiter && limiter > 0;
 
     const res: any = await fetch(url, {
@@ -23,11 +23,11 @@ export const parseGrpcData = async (
         body: JSON.stringify(body),
     });
     const reader = res.body.getReader();
-    let decoder = new TextDecoder('utf8');
+    const decoder = new TextDecoder('utf8');
     while (true) {
         const { value, done } = await reader.read();
         if (done) break;
-        let chunk: string = decoder.decode(value);
+        const chunk: string = decoder.decode(value);
         const chunkData = chunk.split(/\r?\n/);
         const lastData = last(chunkData) || '';
         let includedParsedData;
