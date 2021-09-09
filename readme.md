@@ -54,8 +54,8 @@ parseGrpcData(
         }
     },
     {
-        limiter: 6, // Every 6 items received, the function in
-			        // param 5 `onChunkReceive` will be called.
+        limiter: 20, // Every 20 items received, the function in
+			        // param 3 `onChunkReceive` will be called.
         concatData: false,
         objectPrefix: 'result.aws',
     },
