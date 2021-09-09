@@ -21,6 +21,9 @@ Import the **parseGrpcData** function in your file via the command
 import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
 ```
 
+Then call it like you would a normal function
+`parseGrpcData(**PARAMS_HERE**)`
+
 parseGrpcData has **3 parameters**:
 
 1. **requestObject** - `required` - _object_ - request object has 4 properties:
@@ -38,13 +41,6 @@ parseGrpcData has **3 parameters**:
 
 ```
 import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
-
-const headers = {
-    //Header object
-};
-const body = {
-    //Body object
-};
 
 parseGrpcData(
     {
