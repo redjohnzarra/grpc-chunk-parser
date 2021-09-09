@@ -31,7 +31,7 @@ parseGrpcData has **3 parameters**:
     - **method** - `required` - _string_ - http method, currently 'POST' or 'GET'
     - **headers** - `required` - _object_ - request headers
     - **body** - `required` - _object_ - request body
-2. **dataObject** - `required` - _object_ - has the following 3 available properties (you can pass an empty object):
+2. **dataObject** - `required` (you can pass an empty object) - _object_ - has the following 3 available properties:
     - **limiter** - `optional` - _integer_ - number of items to be returned in each chunk (chunk pagesize)
     - **concatData** - `optional` - _boolean_ - indicator if data to be returned is every chunk or all the data up to the current limit
     - **objectPrefix** - `optional` - _string_ - for returning the object on a specific object path
