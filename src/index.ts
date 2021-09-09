@@ -5,20 +5,23 @@ export interface DynamicObject {
 }
 
 export const parseGrpcData = async (
-    url: string,
-    method: 'POST' | 'GET' | 'post' | 'get',
-    headers: DynamicObject,
-    body: DynamicObject,
-    onChunkReceive: (data: any) => void,
-    extraProps?: {
-        limiter?: number;
+    requestObject: {
+        url: string;
+        method: 'POST' | 'GET' | 'post' | 'get';
+        headers: DynamicObject;
+        body: DynamicObject;
+    },
+    dataObject: {
+        limiter?: number; //limit/page size before data is being returned
         concatData?: boolean; //returns all data from start until the limit
         objectPrefix?: string; // string for returning the object on a specific object path
-    }
+    },
+    onChunkReceive: (data: any) => void
 ) => {
-    const limiter = get(extraProps, 'limiter');
-    const concatData = get(extraProps, 'concatData');
-    const objectPrefix = get(extraProps, 'objectPrefix');
+    const { url, method, headers, body } = requestObject;
+    const limiter = get(dataObject, 'limiter');
+    const concatData = get(dataObject, 'concatData');
+    const objectPrefix = get(dataObject, 'objectPrefix');
     let lastCutData = '';
     const allData: DynamicObject[] = [];
     const limiterData: DynamicObject[] = [];
