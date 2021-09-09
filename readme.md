@@ -39,13 +39,6 @@ parseGrpcData has 3 parameters
 ```
 import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
 
-const headers = {
-    //Header object
-};
-const body = {
-    //Body object
-};
-
 parseGrpcData(
     {
         url: "SAMPLE_URL_HERE",

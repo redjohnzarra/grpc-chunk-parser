@@ -1,6 +1,6 @@
 {
     "name": "@redjohnzarra/grpc-chunk-parser",
-    "version": "1.0.18",
+    "version": "1.0.2",
     "description": "Typescript package for parsing grpc chunk data",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
