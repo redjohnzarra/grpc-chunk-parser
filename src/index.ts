@@ -1,4 +1,4 @@
-import { clone, first, forEach, isEmpty, last } from 'lodash';
+import { clone, first, forEach, get, isEmpty, last } from 'lodash';
 
 export interface DynamicObject {
     [key: string]: any;
@@ -10,9 +10,15 @@ export const parseGrpcData = async (
     headers: DynamicObject,
     body: DynamicObject,
     onChunkReceive: (data: any) => void,
-    limiter?: number,
-    concatData?: boolean //returns all data from start until the limit
+    extraProps?: {
+        limiter?: number;
+        concatData?: boolean; //returns all data from start until the limit
+        objectPrefix?: string; // string for returning the object on a specific object path
+    }
 ) => {
+    const limiter = get(extraProps, 'limiter');
+    const concatData = get(extraProps, 'concatData');
+    const objectPrefix = get(extraProps, 'objectPrefix');
     let lastCutData = '';
     const allData: DynamicObject[] = [];
     const limiterData: DynamicObject[] = [];
@@ -26,6 +32,7 @@ export const parseGrpcData = async (
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf8');
     while (true) {
+        const parsedChunkData: DynamicObject[] = [];
         const { value, done } = await reader.read();
         if (done) break;
         const chunk: string = decoder.decode(value);
@@ -49,9 +56,13 @@ export const parseGrpcData = async (
             if (!isEmpty(chunkStr)) {
                 try {
                     const parsedChunk = JSON.parse(chunkStr);
-                    allData.push(parsedChunk);
+                    const pushedData = objectPrefix
+                        ? get(parsedChunk, objectPrefix)
+                        : parsedChunk;
+                    allData.push(pushedData);
+                    parsedChunkData.push(pushedData);
                     if (hasLimiter) {
-                        limiterData.push(parsedChunk);
+                        limiterData.push(pushedData);
                         if (limiterData.length === limiter) {
                             const newLimiterData = clone(limiterData);
                             limiterData.splice(0, limiter);
@@ -62,13 +73,13 @@ export const parseGrpcData = async (
                         }
                     }
                 } catch (_err) {
-                    throw new Error('Failed to parse json chunk');
+                    console.log('Failed to parse json chunk');
                 }
             }
         });
 
         if (!hasLimiter) {
-            const returnedData = concatData ? allData : chunk;
+            const returnedData = concatData ? allData : parsedChunkData;
             onChunkReceive(returnedData);
         }
     }
