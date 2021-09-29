@@ -16,7 +16,8 @@ export const parseGrpcData = async (
         concatData?: boolean; //returns all data from start until the limit
         objectPrefix?: string; // string for returning the object on a specific object path
     },
-    onChunkReceive: (data: any) => void
+    onChunkReceive: (data: any) => void,
+    onError?: (e: any) => void
 ) => {
     const { url, method, headers, body } = requestObject;
     const limiter = get(dataObject, 'limiter');
@@ -31,6 +32,8 @@ export const parseGrpcData = async (
         method,
         headers,
         body: JSON.stringify(body),
+    }).catch((e: any) => {
+        if (onError) onError(e);
     });
     const reader = res.body.getReader();
     const decoder = new TextDecoder('utf8');
@@ -89,5 +92,9 @@ export const parseGrpcData = async (
     if (hasLimiter && limiterData.length > 0) {
         const returnedData = concatData ? allData : limiterData;
         onChunkReceive(returnedData);
+    }
+
+    if (isEmpty(allData)) {
+        onChunkReceive([]);
     }
 };

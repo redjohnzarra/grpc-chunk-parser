@@ -24,7 +24,7 @@ import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
 Then call it like you would a normal function
 `parseGrpcData(**PARAMS_HERE**)`
 
-parseGrpcData has **3 parameters**:
+parseGrpcData has **4 parameters**:
 
 1. **requestObject** - `required` - _object_ - request object has 4 properties:
     - **url** - `required` - _string_ - the grpc http endpoint
@@ -36,6 +36,7 @@ parseGrpcData has **3 parameters**:
     - **concatData** - `optional` - _boolean_ - indicator if data to be returned is every chunk or all the data up to the current limit
     - **objectPrefix** - `optional` - _string_ - for returning the object on a specific object path
 3. **onChunkReceive** - `required` - _function_ - returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 6th param)
+4. **onError** - `optional` - _function_ - returns the error if an error is encountered during the request
 
 ## Example
 
@@ -62,5 +63,8 @@ parseGrpcData(
     (data: any) => {
         console.log('returned data', data);
     },
+    (err: any) => {
+        console.log('Error here, err)
+    }
 );
 ```
