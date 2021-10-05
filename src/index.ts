@@ -16,8 +16,8 @@ export const parseGrpcData = async (
         concatData?: boolean; //returns all data from start until the limit
         objectPrefix?: string; // string for returning the object on a specific object path
     },
-    onChunkReceive: (data: any) => void,
-    onFinish?: () => void,
+    onChunkReceive?: (data: any) => void,
+    onFinish?: (data: any) => void,
     onError?: (e: any) => void
 ) => {
     const { url, method, headers, body } = requestObject;
@@ -100,6 +100,6 @@ export const parseGrpcData = async (
     }
 
     if (onFinish) {
-        onFinish();
+        onFinish(allData);
     }
 };
