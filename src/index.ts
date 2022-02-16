@@ -49,7 +49,7 @@ export const parseGrpcData = async (
         if (done) break;
         const chunk: string = decoder.decode(value);
         const chunkData = chunk.split(/\r?\n/);
-        const lastData = last(chunkData) || '';
+        const lastData = chunkData.length > 1 ? last(chunkData) || '' : '';
         let includedParsedData;
         if (!isEmpty(lastCutData)) {
             const firstData = first(chunkData) || '';
