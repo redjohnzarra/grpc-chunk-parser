@@ -9,7 +9,7 @@ export const parseGrpcData = async (
         url: string;
         method: 'POST' | 'GET' | 'post' | 'get';
         headers: DynamicObject;
-        body: DynamicObject;
+        body?: DynamicObject;
     },
     dataObject: {
         limiter?: number; //limit/page size before data is being returned
@@ -20,7 +20,7 @@ export const parseGrpcData = async (
     onFinish?: (data: any) => void,
     onError?: (e: any) => void
 ) => {
-    const { url, method, headers, body } = requestObject;
+    const { url, method, headers } = requestObject;
     const limiter = get(dataObject, 'limiter');
     const concatData = get(dataObject, 'concatData');
     const objectPrefix = get(dataObject, 'objectPrefix');
@@ -29,11 +29,16 @@ export const parseGrpcData = async (
     const limiterData: DynamicObject[] = [];
     const hasLimiter = limiter && limiter > 0;
 
-    const res: any = await fetch(url, {
+    const fetchProps: DynamicObject = {
         method,
         headers,
-        body: JSON.stringify(body),
-    }).catch((e: any) => {
+    };
+
+    if (get(requestObject, 'body')) {
+        fetchProps.body = JSON.stringify(requestObject.body);
+    }
+
+    const res: any = await fetch(url, fetchProps).catch((e: any) => {
         if (onError) onError(e);
     });
     const reader = res.body.getReader();
