@@ -1,4 +1,4 @@
-import { clone, first, forEach, get, isEmpty, last } from 'lodash';
+import { clone, first, forEach, get, isEmpty, last, isUndefined } from 'lodash';
 
 export interface DynamicObject {
     [key: string]: any;
@@ -41,9 +41,9 @@ export const parseGrpcData = async (
     const res: any = await fetch(url, fetchProps).catch((e: any) => {
         if (onError) onError(e);
     });
-    const reader = res.body.getReader();
+    const reader = get(res, 'body') ? res.body.getReader() : undefined;
     const decoder = new TextDecoder('utf8');
-    while (true) {
+    while (true && !isUndefined(reader)) {
         const parsedChunkData: DynamicObject[] = [];
         const { value, done } = await reader.read();
         if (done) break;
