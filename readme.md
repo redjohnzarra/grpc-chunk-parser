@@ -35,7 +35,7 @@ parseGrpcData has **5 parameters**:
     - **limiter** - `optional` - _integer_ - number of items to be returned in each chunk (chunk pagesize)
     - **concatData** - `optional` - _boolean_ - indicator if data to be returned is every chunk or all the data up to the current limit
     - **objectPrefix** - `optional` - _string_ - for returning the object on a specific object path
-3. **onChunkReceive** - `optional` - _function_ - returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 6th param)
+3. **onChunkReceive** - `optional` - _function_ - returns the chunk data on each chunk received, (or on specific limit/pagesize defined in the 2nd param)
 4. **onFinish** - `optional` - _function_ - function called when all chunks have been returned, returns the full data
 5. **onError** - `optional` - _function_ - returns the error if an error is encountered during the request
 
