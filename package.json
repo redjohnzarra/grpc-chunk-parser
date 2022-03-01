@@ -17,6 +17,9 @@
     "grpc stream",
     "chunk parse"
   ],
+  "author": {
+    "name": "Alphaus Cloud"
+  },
   "license": "ISC",
   "repository": {
     "url": "https://github.com/alphauslabs/grpc-chunk-parser"
