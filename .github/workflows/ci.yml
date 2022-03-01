@@ -1,11 +1,13 @@
 name: Publish to GitHub Package Registry
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
     build:
         runs-on: ubuntu-latest
-
         steps:
             - uses: actions/checkout@v1
             - name: Use Node.js 8.x
@@ -13,7 +15,7 @@ jobs:
               with:
                   registry-url: https://npm.pkg.github.com/
                   node-version: 8.x
-                  scope: '@redjohnzarra'
+                  scope: '@alphauslabs'
             - name: npm install, build, and test
               run: |
                   npm install

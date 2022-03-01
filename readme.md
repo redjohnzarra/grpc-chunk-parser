@@ -7,18 +7,18 @@ Typescript package for parsing grpc chunk data
 First, add a `.npmrc` file with the following content:
 
 ```
-@redjohnzarra:registry=https://npm.pkg.github.com
+@alphauslabs:registry=https://npm.pkg.github.com
 ```
 
 Then install:
-`npm i -S @redjohnzarra/grpc-chunk-parser`
+`npm i -S @alphauslabs/grpc-chunk-parser`
 
 ## Usage
 
 Import the **parseGrpcData** function in your file via the command
 
 ```
-import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
+import { parseGrpcData } from '@alphauslabs/grpc-chunk-parser';
 ```
 
 Then call it like you would a normal function
@@ -42,7 +42,7 @@ parseGrpcData has **5 parameters**:
 ## Example
 
 ```
-import { parseGrpcData } from '@redjohnzarra/grpc-chunk-parser';
+import { parseGrpcData } from '@alphauslabs/grpc-chunk-parser';
 
 parseGrpcData(
     {
