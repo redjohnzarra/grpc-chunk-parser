@@ -1,5 +1,3 @@
-import { clone, first, forEach, get, isEmpty, last, isUndefined } from 'lodash';
-
 export interface DynamicObject {
     [key: string]: any;
 }
@@ -20,63 +18,57 @@ export const parseGrpcData = async (
     onFinish?: (data: any) => void,
     onError?: (e: any) => void
 ) => {
-    const { url, method, headers } = requestObject;
-    const limiter = get(dataObject, 'limiter');
-    const concatData = get(dataObject, 'concatData');
-    const objectPrefix = get(dataObject, 'objectPrefix');
-    let lastCutData = '';
-    const allData: DynamicObject[] = [];
-    const limiterData: DynamicObject[] = [];
-    const hasLimiter = limiter && limiter > 0;
+    try {
+        console.time('parseGrpcData');
+        const { url, method, headers } = requestObject;
+        const { limiter, concatData, objectPrefix } = dataObject || {};
+        const allData: DynamicObject[] = [];
+        const limiterData: DynamicObject[] = [];
+        const hasLimiter = limiter && limiter > 0;
 
-    const fetchProps: DynamicObject = {
-        method,
-        headers,
-    };
+        const fetchProps: DynamicObject = {
+            method,
+            headers,
+            body: requestObject.body ? JSON.stringify(requestObject.body) : undefined,
+        };
 
-    if (get(requestObject, 'body')) {
-        fetchProps.body = JSON.stringify(requestObject.body);
-    }
+        const res: any = await fetch(url, fetchProps).catch((e: any) => {
+            onError?.(e);
+        });
 
-    const res: any = await fetch(url, fetchProps).catch((e: any) => {
-        if (onError) onError(e);
-    });
-    const reader = get(res, 'body') ? res.body.getReader() : undefined;
-    const decoder = new TextDecoder('utf8');
-    while (true && !isUndefined(reader)) {
-        const parsedChunkData: DynamicObject[] = [];
-        const { value, done } = await reader.read();
-        if (done) break;
-        const chunk: string = decoder.decode(value);
-        const chunkData = chunk.split(/\r?\n/);
-        const lastData = chunkData.length > 1 ? last(chunkData) || '' : '';
-        let includedParsedData;
-        if (!isEmpty(lastCutData)) {
-            const firstData = first(chunkData) || '';
-            includedParsedData = lastCutData + firstData;
-            chunkData[0] = includedParsedData;
-        }
+        let count = 0;
+        let failedCount = 0;
+        const reader = res?.body ? res.body.getReader() : undefined;
+        const decoder = new TextDecoder('utf8');
 
-        if (!isEmpty(lastData)) {
-            lastCutData = lastData;
-            delete chunkData[chunkData.length - 1];
-        } else {
-            lastCutData = '';
-        }
+        let result = '';
+        const startObject = '{"result":';
+        const endObjRegex = /}}\n+/g;
 
-        forEach(chunkData, (chunkStr: string) => {
-            if (!isEmpty(chunkStr)) {
+        while (true && reader) {
+            const parsedChunkData: DynamicObject[] = [];
+            const { value, done } = await reader.read();
+            if (done) break;
+            const chunk: string = decoder.decode(value);
+            result += chunk;
+
+            const startIndex = result.indexOf(startObject);
+            const endIndex = result.search(endObjRegex);
+
+            if (startIndex !== -1 && endIndex !== -1) {
+                const jsonStr = result.substring(startIndex, endIndex + 2);
+                const restOfStr = result.substring(endIndex + 2);
                 try {
-                    const parsedChunk = JSON.parse(chunkStr);
+                    const parsedChunk = JSON.parse(jsonStr);
                     const pushedData = objectPrefix
-                        ? get(parsedChunk, objectPrefix)
+                        ? parsedChunk?.objectPrefix
                         : parsedChunk;
                     allData.push(pushedData);
                     parsedChunkData.push(pushedData);
                     if (hasLimiter) {
                         limiterData.push(pushedData);
                         if (limiterData.length === limiter) {
-                            const newLimiterData = clone(limiterData);
+                            const newLimiterData = [...limiterData];
                             limiterData.splice(0, limiter);
                             const returnedData = concatData
                                 ? allData
@@ -85,26 +77,32 @@ export const parseGrpcData = async (
                         }
                     }
                 } catch (_err) {
+                    // onError(_err);
                     console.log('Failed to parse json chunk');
+                    failedCount++;
+                } finally {
+                    result = restOfStr;
+                    count++;
                 }
             }
-        });
+        }
 
-        if (!hasLimiter) {
-            const returnedData = concatData ? allData : parsedChunkData;
+        if (hasLimiter && limiterData.length > 0) {
+            const returnedData = concatData ? allData : limiterData;
             onChunkReceive(returnedData);
         }
-    }
-    if (hasLimiter && limiterData.length > 0) {
-        const returnedData = concatData ? allData : limiterData;
-        onChunkReceive(returnedData);
-    }
 
-    if (isEmpty(allData)) {
-        onChunkReceive([]);
-    }
+        if (allData.length === 0) {
+            onChunkReceive([]);
+        }
 
-    if (onFinish) {
-        onFinish(allData);
+        if (onFinish) {
+            console.log("count: ", count);
+            console.log("failed count: ", failedCount);
+            console.timeEnd('parseGrpcData');
+            onFinish(allData);
+        }
+    } catch (error) {
+        if (onError) onError(error);
     }
 };

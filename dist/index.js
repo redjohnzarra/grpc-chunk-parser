@@ -35,77 +35,110 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseGrpcData = void 0;
-var lodash_1 = require("lodash");
-exports.parseGrpcData = function (url, method, headers, body, onChunkReceive, limiter) { return __awaiter(void 0, void 0, void 0, function () {
-    var lastCutData, allData, limiterData, hasLimiter, res, reader, decoder, _a, value, done, chunk, chunkData, lastData, includedParsedData, firstData;
-    return __generator(this, function (_b) {
-        switch (_b.label) {
+exports.parseGrpcData = function (requestObject, dataObject, onChunkReceive, onFinish, onError) { return __awaiter(void 0, void 0, void 0, function () {
+    var url, method, headers, _a, limiter, concatData, objectPrefix, allData, limiterData, hasLimiter, fetchProps, res, count, failedCount, reader, decoder, result, startObject, endObjRegex, parsedChunkData, _b, value, done, chunk, startIndex, endIndex, jsonStr, restOfStr, parsedChunk, pushedData, newLimiterData, returnedData, returnedData, error_1;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                lastCutData = '';
+                _c.trys.push([0, 5, , 6]);
+                console.time('parseGrpcData');
+                url = requestObject.url, method = requestObject.method, headers = requestObject.headers;
+                _a = dataObject || {}, limiter = _a.limiter, concatData = _a.concatData, objectPrefix = _a.objectPrefix;
                 allData = [];
                 limiterData = [];
                 hasLimiter = limiter && limiter > 0;
-                return [4 /*yield*/, fetch(url, {
-                        method: method,
-                        headers: headers,
-                        body: JSON.stringify(body),
+                fetchProps = {
+                    method: method,
+                    headers: headers,
+                    body: requestObject.body ? JSON.stringify(requestObject.body) : undefined,
+                };
+                return [4 /*yield*/, fetch(url, fetchProps).catch(function (e) {
+                        onError === null || onError === void 0 ? void 0 : onError(e);
                     })];
             case 1:
-                res = _b.sent();
-                reader = res.body.getReader();
+                res = _c.sent();
+                count = 0;
+                failedCount = 0;
+                reader = (res === null || res === void 0 ? void 0 : res.body) ? res.body.getReader() : undefined;
                 decoder = new TextDecoder('utf8');
-                _b.label = 2;
+                result = '';
+                startObject = '{"result":';
+                endObjRegex = /}}\n+/g;
+                _c.label = 2;
             case 2:
-                if (!true) return [3 /*break*/, 4];
+                if (!(true && reader)) return [3 /*break*/, 4];
+                parsedChunkData = [];
                 return [4 /*yield*/, reader.read()];
             case 3:
-                _a = _b.sent(), value = _a.value, done = _a.done;
+                _b = _c.sent(), value = _b.value, done = _b.done;
                 if (done)
                     return [3 /*break*/, 4];
                 chunk = decoder.decode(value);
-                chunkData = chunk.split(/\r?\n/);
-                lastData = lodash_1.last(chunkData) || '';
-                includedParsedData = void 0;
-                if (!lodash_1.isEmpty(lastCutData)) {
-                    firstData = lodash_1.first(chunkData) || '';
-                    includedParsedData = lastCutData + firstData;
-                    chunkData[0] = includedParsedData;
-                }
-                if (!lodash_1.isEmpty(lastData)) {
-                    lastCutData = lastData;
-                    delete chunkData[chunkData.length - 1];
-                }
-                else {
-                    lastCutData = '';
-                }
-                lodash_1.forEach(chunkData, function (chunkStr) {
-                    if (!lodash_1.isEmpty(chunkStr)) {
-                        try {
-                            var parsedChunk = JSON.parse(chunkStr);
-                            allData.push(parsedChunk);
-                            if (hasLimiter) {
-                                limiterData.push(parsedChunk);
-                                if (limiterData.length === limiter) {
-                                    var newLimiterData = lodash_1.clone(limiterData);
-                                    limiterData.splice(0, limiter);
-                                    onChunkReceive(newLimiterData);
-                                }
+                result += chunk;
+                startIndex = result.indexOf(startObject);
+                endIndex = result.search(endObjRegex);
+                if (startIndex !== -1 && endIndex !== -1) {
+                    jsonStr = result.substring(startIndex, endIndex + 2);
+                    restOfStr = result.substring(endIndex + 2);
+                    try {
+                        parsedChunk = JSON.parse(jsonStr);
+                        pushedData = objectPrefix
+                            ? parsedChunk === null || parsedChunk === void 0 ? void 0 : parsedChunk.objectPrefix : parsedChunk;
+                        allData.push(pushedData);
+                        parsedChunkData.push(pushedData);
+                        if (hasLimiter) {
+                            limiterData.push(pushedData);
+                            if (limiterData.length === limiter) {
+                                newLimiterData = __spreadArrays(limiterData);
+                                limiterData.splice(0, limiter);
+                                returnedData = concatData
+                                    ? allData
+                                    : newLimiterData;
+                                onChunkReceive(returnedData);
                             }
                         }
-                        catch (_err) {
-                            throw new Error('Failed to parse json chunk');
-                        }
                     }
-                });
-                if (!hasLimiter)
-                    onChunkReceive(chunk);
+                    catch (_err) {
+                        // onError(_err);
+                        console.log('Failed to parse json chunk');
+                        failedCount++;
+                    }
+                    finally {
+                        result = restOfStr;
+                        count++;
+                    }
+                }
                 return [3 /*break*/, 2];
             case 4:
-                if (hasLimiter && limiterData.length > 0)
-                    onChunkReceive(limiterData);
-                return [2 /*return*/];
+                if (hasLimiter && limiterData.length > 0) {
+                    returnedData = concatData ? allData : limiterData;
+                    onChunkReceive(returnedData);
+                }
+                if (allData.length === 0) {
+                    onChunkReceive([]);
+                }
+                if (onFinish) {
+                    console.log("count: ", count);
+                    console.log("failed count: ", failedCount);
+                    console.timeEnd('parseGrpcData');
+                    onFinish(allData);
+                }
+                return [3 /*break*/, 6];
+            case 5:
+                error_1 = _c.sent();
+                if (onError)
+                    onError(error_1);
+                return [3 /*break*/, 6];
+            case 6: return [2 /*return*/];
         }
     });
 }); };
